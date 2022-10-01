@@ -1,7 +1,17 @@
 const mongoose = require ('mongoose')
 
-const thoughtSchema = new mongoose.Schema({
+const reactionSchema = new mongoose.Schema({
+    reactionId: { type: ObjectId, default: new mongoose.Types.ObjectId()},
+    reactionBody: { type: String, required: true, maxLength: 280},
+    username: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now}
+})
 
+const thoughtSchema = new mongoose.Schema({
+    thoughtText: { type: String, required: true, minLength: 1, maxLength: 280},
+    createdAt: {type: Date, default: Date.now, get: v => v.toLocaleString() },
+    username: { type: String, required: true},
+    reactions: 
 })
 
 const Thought = mongoose.model('Thought', thoughtSchema)
