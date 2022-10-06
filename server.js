@@ -22,7 +22,7 @@ app.get("/api/users", (req, res) => {
 });
 
 app.get("/api/users/:id", (req, res) => {
-  User.findOne({ id: req.params.id }, (err, result) => {
+  User.findOne({ _id: req.params.id }, (err, result) => {
     if (result) {
       res.status(200).json(result);
     } else {
@@ -45,7 +45,7 @@ app.post("/api/users", (req, res) => {
 
 app.put("/api/users/:id", (req, res) => {
   User.findOneAndUpdate(
-    { id: req.params.id },
+    { _id: req.params.id },
     req.body,
     { new: true },
     (err, result) => {
@@ -60,7 +60,7 @@ app.put("/api/users/:id", (req, res) => {
 });
 
 app.delete("/api/users/:id", (req, res) => {
-  User.findOneAndDelete({ id: req.params.id }, (err, result) => {
+  User.findOneAndDelete({ _id: req.params.id }, (err, result) => {
     if (result) {
       res.status(200).json(result);
     } else {
@@ -71,9 +71,39 @@ app.delete("/api/users/:id", (req, res) => {
 });
 
 app.post("/api/users/:userId/friends/:friendId", (req, res) => {
-  User.findOne({ id: req.params.userId }, (err, user) => {
+  User.findOne({ _id: req.params.userId }, (err, user) => {
     if (user) {
       user.friends.push(req.params.friendId);
+      user.save();
+      res.status(200).json(user);
+    } else {
+      console.log("Uh Oh, something went wrong");
+      res.status(500).json({ error: "Something went wrong" });
+    }
+  });
+});
+
+app.delete("/api/users/:userId/friends/:friendId", (req, res) => {
+  User.findOne({ _id: req.params.userId }, (err, user) => {
+    if (user) {
+      let removeIndex = null;
+      for (let i = 0; i < user.friends.length; i++) {
+        let friend = user.friends[i];
+        console.log(friend._id)
+        if (friend._id == req.params.friendId) removeIndex = i;
+      }
+      console.log(removeIndex)
+      if (removeIndex !== null) {
+        console.log('here')
+        var newFriends = null
+        if (user.friends.length === 1) {
+          newFriends = []
+        } else {
+          newFriends = user.friends.splice(removeIndex-1, 1);
+        }
+        console.log(newFriends)
+        user.friends = newFriends
+      }
       user.save();
       res.status(200).json(user);
     } else {
@@ -95,7 +125,7 @@ app.get("/api/thoughts", (req, res) => {
 });
 
 app.get("/api/thoughts/:id", (req, res) => {
-  Thought.findOne({ id: req.params.id }, (err, result) => {
+  Thought.findOne({ _id: req.params.id }, (err, result) => {
     if (result) {
       res.status(200).json(result);
     } else {
@@ -122,7 +152,7 @@ app.post("/api/thoughts", (req, res) => {
 
 app.put("/api/thoughts/:id", (req, res) => {
   Thought.findOneAndUpdate(
-    { id: req.params.id },
+    { _id: req.params.id },
     req.body,
     { new: true },
     (err, result) => {
@@ -137,7 +167,7 @@ app.put("/api/thoughts/:id", (req, res) => {
 });
 
 app.delete("/api/thoughts/:id", (req, res) => {
-  Thought.findOneAndDelete({ id: req.params.id }, (err, result) => {
+  Thought.findOneAndDelete({ _id: req.params.id }, (err, result) => {
     if (result) {
       res.status(200).json(result);
     } else {
@@ -148,7 +178,7 @@ app.delete("/api/thoughts/:id", (req, res) => {
 });
 
 app.post("/api/thoughts/:id/reactions", (req, res) => {
-  Thought.findOne({ id: req.params.id }, (err, thought) => {
+  Thought.findOne({ _id: req.params.id }, (err, thought) => {
     if (thought) {
       thought.reactions.push(req.body);
       thought.save();
@@ -161,14 +191,22 @@ app.post("/api/thoughts/:id/reactions", (req, res) => {
 });
 
 app.delete("/api/thoughts/:id/reactions/:reactionId", (req, res) => {
-  Thought.findOne({ id: req.params.id }, (err, thought) => {
+  Thought.findOne({ _id: req.params.id }, (err, thought) => {
     if (thought) {
       let removeIndex = null;
       for (let i = 0; i < thought.reactions.length; i++) {
         let reaction = thought.reactions[i];
-        if (reaction.id === req.params.reactionId) removeIndex = i;
+        if (reaction.reactionId == req.params.reactionId) removeIndex = i;
       }
-      if (removeIndex) thought.reactions = thought.reactions.splice(i, 1);
+      if (removeIndex !== null) {
+        var newReactions = null
+        if (thought.reactions.length === 1) {
+          newReactions = []
+        } else {
+          newReactions = thought.reactions.splice(removeIndex-1, 1);
+        }
+        thought.reactions = newReactions
+      }
       thought.save();
       res.status(200).json(thought);
     } else {

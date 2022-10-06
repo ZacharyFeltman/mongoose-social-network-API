@@ -42,13 +42,34 @@ const userSchema = new Schema(
 const User = model("User", userSchema);
 
 const handleError = (err) => console.error(err);
+const userSeedData = [
+  {
+    username: 'Zach',
+    email: 'zach@email.com',
+    thoughts: [],
+    friends: []
+  },
+  {
+    username: 'ross',
+    email: 'ross@email.com',
+    thoughts: [],
+    friends: []
+  },
+  {
+    username: 'steph',
+    email: 'steph@email.com',
+    thoughts: [],
+    friends: []
+  },
+]
+
 
 User.find({}).exec((err, collection) => {
   if (err) {
     return handleError(err);
   }
   if (collection.length === 0) {
-    return User.insertMany([], (insertError) =>
+    return User.insertMany(userSeedData, (insertError) =>
       insertError ? handleError(insertError) : console.log("Inserted")
     );
   }

@@ -28,15 +28,34 @@ const Thought = model('Thought', thoughtSchema)
 
 const handleError = (err) => console.error(err);
 
+const thoughtSeedData = [
+  {
+    thoughtText: 'thought1',
+    createdAt: Date.now(),
+    username: 'Zach',
+    reactions: []
+  },
+  {
+    thoughtText: 'thought2',
+    createdAt: Date.now(),
+    username: 'ross',
+    reactions: []
+  },
+  {
+    thoughtText: 'thought3',
+    createdAt: Date.now(),
+    username: 'steph',
+    reactions: []
+  },
+]
+
 Thought.find({}).exec((err, collection) => {
     if (err) {
       return handleError(err);
     }
     if (collection.length === 0) {
         return Thought.insertMany(
-            [
-
-            ],
+          thoughtSeedData,
             (insertError) =>
                 insertError ? handleError(insertError) : console.log('Inserted')
         )
